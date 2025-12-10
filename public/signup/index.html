@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+</head>
+
+<body>
+    <h1 id="heading"></h1>
+    <p>Create Account</p>
+    <form id="signup-form" type="POST">
+        <div>
+            Username: <input name="username" />
+        </div>
+        <div>
+            Password: <input name="password" type="password" />
+        </div>
+        <button id="signup-button" type="submit">Create Account</button>
+    </form>
+    <output id="signup-result" for="signup-form"></output>
+    <script>
+        const signupForm = document.getElementById('signup-form');
+        signupForm.addEventListener("submit", (event) => {
+            console.log("Form submitted");
+            event.preventDefault();
+
+            const formData = new FormData(signupForm);
+
+            fetch('/loginz', {
+                method: "POST",
+                body: formData,
+            })
+                .then((resp) => resp.text())
+                .then((text) => {
+                    console.log("Form result received");
+                    const h1 = document.getElementById('signup-result');
+                    h1.textContent = text;
+                });
+
+        });
+    </script>
+</body>
+
+</html>
