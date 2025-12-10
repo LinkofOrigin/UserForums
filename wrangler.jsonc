@@ -22,7 +22,8 @@
 		{
 			"binding": "USER_FORUMS_DB",
 			"database_name": "user-forums-d1",
-			"database_id": "40101c42-b019-4158-a729-9a20046874a9"
+			"database_id": "40101c42-b019-4158-a729-9a20046874a9",
+			// "remote": true // Use this to hit the live prod db
 		}
 	]
 	/**

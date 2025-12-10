@@ -17,7 +17,10 @@ export default {
 				console.log(`DB = ${env.USER_FORUMS_DB}`);
 				// If you did not use `DB` as your binding name, change it here
 				const { results } = await env.USER_FORUMS_DB.prepare(
-					"SELECT * FROM posts WHERE id = ?",
+					`SELECT users.id, users.username, posts.title, posts.description
+					FROM users
+					JOIN posts ON posts.user_id = users.id
+					WHERE users.id = ?`
 				)
 					.bind("1")
 					.run();

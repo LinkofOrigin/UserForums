@@ -1,3 +1,18 @@
+# Wrangler
+.wrangler/
+
+
+# D1 Database
+schema.sql
+*.sqlite
+
+
+# VSCode
+.vscode/
+
+
+# GENERATED IGNORES BELOW
+
 # Logs
 logs
 *.log
