@@ -9,24 +9,37 @@
  */
 import Environment from "./bootstrap/bootstrap";
 import Authentication from "./authentication/auth";
+import Signup from "./authentication/signup";
+
+async function parseRequestFormBody(request) {
+	const formData = await request.formData();
+	const body = {};
+	for (const entry of formData.entries()) {
+		body[entry[0]] = entry[1];
+	}
+	return body;
+}
 
 export default {
 	async fetch(request, env, ctx) {
 		Environment.loadEnvironment(env);
 		const url = new URL(request.url);
 		console.log(`Receiving endpoint call: ${url.pathname}`);
+		const body = await parseRequestFormBody(request);
 
 		switch (url.pathname) {
 			case '/api/login':
 				console.log(`Attempting login`);
-				const formData = await request.formData();
-				const body = {};
-				for (const entry of formData.entries()) {
-					body[entry[0]] = entry[1];
-				}
 				const loginResults = await Authentication.attemptLogin(body.username, body.password);
 				console.log(`Responding from login with: ${JSON.stringify(loginResults)}`);
 				return Response.json(loginResults);
+
+			case '/api/signup':
+				console.log("Attempting signup");
+				const signup = new Signup();
+				const signupResult = await signup.attemptAccountCreation(body.username, body.password);
+				return Response.json(loginResults);
+
 
 			case '/message':
 				console.log(`DB = ${Environment.instance.USER_FORUMS_DB}`);
