@@ -1,39 +1,51 @@
 import Environment from "../bootstrap/bootstrap";
+import QueryBuilder from "./queryBuilder";
 
 class Database {
 
     async select(table, fields = [], where = {}) {
         console.log(`Attempting SELECT`);
         const database = Environment.instance.USER_FORUMS_DB;
-        let selectQuery = database
-            .prepare(`
-                SELECT ?
-                FROM ?
-                ?
-            `);
-        let bindings = [];
-        bindings[0] = '*';
-        if (fields.length > 0) {
-            bindings[0] = fields.join(',');
-        }
-        bindings[1] = table;
-        bindings[2] = "";
-        if (Object.keys(where).length > 0) {
-            let whereFilters = "";
-            Object.entries(where).forEach((filter) => {
-                let key = filter[0];
-                let val = filter[1];
-                if (whereFilters.length > 0) {
-                    whereFilters += ' AND ';
-                }
-                whereFilters += `${key} = ${val}`;
-            });
-            bindings[2] = `WHERE ${whereFilters}`;
-        }
-        selectQuery = selectQuery.bind(...bindings);
+        let queryBuilder = new QueryBuilder(database);
+        queryBuilder.select(table, fields).where(where);
+        let selectQuery = queryBuilder.parse();
 
-        console.log(`Running insert: ${JSON.stringify(selectQuery)}`);
-        const results = await selectQuery.run();
+        console.log(`Running SELECT: ${JSON.stringify(selectQuery)}`);
+        let results = null;
+        try {
+            results = await selectQuery.run();
+        }
+        catch (error) {
+            console.error(`Received error during db select call: ${JSON.stringify(error)}`);
+            throw error;
+        }
+
+        console.log(`Returning database result from select: ${JSON.stringify(results)}`);
+        if (!results.success) {
+            console.error("Error selecting records from Database!");
+            throw new Error("Failed to select records from DB!");
+        }
+
+        return results.results;
+    }
+
+    async insert(table, fields = [], values = [], where = {}) {
+        const database = Environment.instance.USER_FORUMS_DB;
+        let queryBuilder = new QueryBuilder(database);
+        queryBuilder.insert(table, fields, values).where(where);
+        let insertQuery = queryBuilder.parse();
+
+        console.log(`Running INSERT: ${JSON.stringify(insertQuery)}`);
+
+        let results;
+        try {
+            results = await insertQuery.run();
+        }
+        catch (error) {
+            console.error(`Received error during db insert call: ${JSON.stringify(error)}`);
+            throw error;
+        }
+
         console.log(`Returning database result from insert: ${JSON.stringify(results)}`);
         if (!results.success) {
             console.error("Error inserting records into Database!");
@@ -43,21 +55,12 @@ class Database {
         return results.results;
     }
 
-    async insert(table, username, password) {
-        console.log(`Attempting INSERT: Table=${table}, User=${username}, Pass=nah`);
-        const database = Environment.instance.USER_FORUMS_DB;
-        let insertQuery = database.prepare(`INSERT INTO ?1 (username, password) VALUES (?2, ?3)`);
-        insertQuery = insertQuery.bind(table, username, password);
+    async update(table, fields = [], values = [], where = {}) {
 
-        console.log(`Running insert: ${JSON.stringify(insertQuery)}`);
-        const results = await insertQuery.run();
-        console.log(`Returning database result from insert: ${JSON.stringify(results)}`);
-        if (!results.success) {
-            console.error("Error inserting records into Database!");
-            throw new Error("Failed to insert records into DB!");
-        }
+    }
 
-        return results.results;
+    async delete(table, where = {}) {
+
     }
 
     async query(query, bindings = []) {

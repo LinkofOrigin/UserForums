@@ -3,12 +3,14 @@ import DBInstance from "../database/db";
 class Signup {
 
     async attemptAccountCreation(username, password) {
-        if (await this.usernameExists(username)) {
+        const userAlreadyExists = await this.usernameExists(username);
+        console.log(`Does user exist? Username=${username}, Exists=${userAlreadyExists}`);
+        if (userAlreadyExists) {
             throw new Error("Unable to create account - username already exists!");
         }
 
         // TODO: Hash password
-        const insertResults = await DBInstance.insert('users', username, password);
+        const insertResults = await DBInstance.insert('users', ['username', 'password'], [username, password]);
         return true;
     }
 
