@@ -28,7 +28,7 @@
                 let expireDateString = expireDate.toUTCString();
                 expirationString = `; expires=${expireDateString}`;
             }
-            const cookieString = `${name}=${value}${expirationString}; path=/`;
+            const cookieString = `${name}=${value}${expirationString}; path=/;`;
             console.log(`Saving new cookie: ${cookieString}`);
             document.cookie = cookieString;
         }
@@ -52,7 +52,8 @@
                     const newSession = json.data.loginSession;
                     const token = newSession.token;
                     const expires = newSession.expiration;
-                    saveCookie('session', token, expires);
+                    // saveCookie('session', token, expires);
+                    console.log(`New cookie state: ${JSON.stringify(document.cookie)}`);
                 });
 
         });

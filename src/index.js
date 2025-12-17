@@ -34,15 +34,17 @@ export default {
 				body = await parseRequestFormBody(request);
 				const loginSession = await Authentication.attemptLogin(body.username, body.password);
 				console.log(`Responding from login with: ${JSON.stringify(loginSession)}`);
-				const loginResponseJSON = {
-					data: {
-						loginSession: loginSession,
-					},
-					// headers: new Headers({
-					// 	'Set-Cookie': `session=${sessionToken}`
-					// }),
+				const loginResponseData = {
+					loginSession: loginSession,
 				};
-				return Response.json(loginResponseJSON);
+				const loginResponseOptions = {
+					headers: new Headers({
+						'Set-Cookie': `session=${loginSession.token}; path=/; HttpOnly; Secure;`
+					}),
+				};
+				const loginResponse = Response.json(loginResponseData, loginResponseOptions);
+				console.log(`Login response: ${JSON.stringify(loginResponse)}`);
+				return loginResponse;
 
 			case '/api/signup':
 				console.log("Attempting signup");

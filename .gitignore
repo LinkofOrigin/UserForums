@@ -3,7 +3,6 @@
 
 
 # D1 Database
-schema.sql
 *.sqlite
 
 

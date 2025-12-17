@@ -11,25 +11,14 @@
     <h1 id="heading">Account Details</h1>
     <div id="account-content"></div>
     <script>
-        // const loginForm = document.getElementById('login-form');
-        // loginForm.addEventListener("submit", (event) => {
-        //     console.log("Form submitted");
-        //     event.preventDefault();
+        function parseCookie(name) {
+            const cookies = document.cookie.split(';');
+            console.log(`all cookies = ${JSON.stringify(cookies)}`);
+            return cookies[name];
+        }
 
-        //     const formData = new FormData(loginForm);
-
-        //     fetch('/api/login', {
-        //         method: "POST",
-        //         body: formData,
-        //     })
-        //         .then((resp) => resp.text())
-        //         .then((text) => {
-        //             console.log("Form result received");
-        //             const h1 = document.getElementById('login-result');
-        //             h1.textContent = text;
-        //         });
-
-        // });
+        let sessionCookie = parseCookie('session');
+        console.log(`Session Cookie: ${sessionCookie}`);
     </script>
 </body>
 
