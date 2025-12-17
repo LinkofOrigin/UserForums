@@ -1,16 +1,18 @@
 import DBInstance from "../database/db";
+import Session from "./sessions";
 
 class Authentication {
 
     static async attemptLogin(username, password) {
         console.log("Attempting login for user");
-        const query = `SELECT id FROM users WHERE username = ? AND password = ?`;
-        let bindings = [username, password];
-        const loginResults = await DBInstance.query(query, bindings);
+        const loginResults = await DBInstance.select('users', ['id', 'username', 'password'], { 'username': username, 'password': password });
         if (loginResults.length > 0) {
             const foundId = loginResults[0].id;
             console.log(`Found user: ${foundId}`);
-            return foundId;
+            const freshSession = new Session(foundId);
+            const sessionSave = await freshSession.save();
+            console.log(`Created session for user with id=${foundId}`);
+            return freshSession;
         }
         else {
             console.log("Invalid credentials");

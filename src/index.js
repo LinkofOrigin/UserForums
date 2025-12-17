@@ -32,16 +32,36 @@ export default {
 			case '/api/login':
 				console.log(`Attempting login`);
 				body = await parseRequestFormBody(request);
-				const loginResults = await Authentication.attemptLogin(body.username, body.password);
-				console.log(`Responding from login with: ${JSON.stringify(loginResults)}`);
-				return Response.json(loginResults);
+				const loginSession = await Authentication.attemptLogin(body.username, body.password);
+				console.log(`Responding from login with: ${JSON.stringify(loginSession)}`);
+				const loginResponseJSON = {
+					data: {
+						loginSession: loginSession,
+					},
+					// headers: new Headers({
+					// 	'Set-Cookie': `session=${sessionToken}`
+					// }),
+				};
+				return Response.json(loginResponseJSON);
 
 			case '/api/signup':
 				console.log("Attempting signup");
 				body = await parseRequestFormBody(request);
 				const signup = new Signup();
 				const signupResult = await signup.attemptAccountCreation(body.username, body.password);
-				return Response.json(signupResult);
+				console.log("Successfully signed up new user! Attempting immediate login...");
+
+				// Successful signup, now login
+				const signupSession = await Authentication.attemptLogin(body.username, body.password);
+				const signupResponse = {
+					data: {
+						loginSession: signupSession,
+					},
+					// headers: new Headers({
+					// 	'Set-Cookie': `session=${sessionToken}`
+					// }),
+				};
+				return Response.json(signupResponse);
 
 
 			case '/message':

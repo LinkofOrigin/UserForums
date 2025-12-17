@@ -21,6 +21,18 @@
     </form>
     <output id="login-result" for="login-form"></output>
     <script>
+        function saveCookie(name, value, expiration = -1) {
+            let expirationString = "";
+            if (expiration.length > 0) {
+                let expireDate = new Date(expiration);
+                let expireDateString = expireDate.toUTCString();
+                expirationString = `; expires=${expireDateString}`;
+            }
+            const cookieString = `${name}=${value}${expirationString}; path=/`;
+            console.log(`Saving new cookie: ${cookieString}`);
+            document.cookie = cookieString;
+        }
+
         const loginForm = document.getElementById('login-form');
         loginForm.addEventListener("submit", (event) => {
             console.log("Form submitted");
@@ -32,11 +44,15 @@
                 method: "POST",
                 body: formData,
             })
-                .then((resp) => resp.text())
-                .then((text) => {
+                .then((resp) => resp.json())
+                .then((json) => {
                     console.log("Form result received");
                     const h1 = document.getElementById('login-result');
-                    h1.textContent = text;
+                    h1.textContent = JSON.stringify(json);
+                    const newSession = json.data.loginSession;
+                    const token = newSession.token;
+                    const expires = newSession.expiration;
+                    saveCookie('session', token, expires);
                 });
 
         });

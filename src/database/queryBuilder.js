@@ -15,7 +15,6 @@ export default class QueryBuilder {
         let whereString = "";
         if (Object.keys(this.filters).length > 0) {
             let whereFilters = [];
-            console.log(`Processing where filters: ${JSON.stringify(this.filters)}`);
             Object.entries(this.filters).forEach((filter) => {
                 let key = filter[0];
                 let val = filter[1];
@@ -23,26 +22,20 @@ export default class QueryBuilder {
                     whereFilters.push('AND');
                 }
                 whereFilters.push(`${key} = ?`);
-                console.log(`Adding where binding: ${key}=${val}`);
                 this.bindings.push(val);
             });
 
-            console.log(`Where filters: ${JSON.stringify(whereFilters)}`);
 
             let whereFilterString = whereFilters.join(' ');
             whereString = `WHERE ${whereFilterString}`;
-            console.log(`Where string: ${whereString}`);
         }
 
         let query = `${commandString} ${whereString}`.trim();
-        console.log(`Query string ${query}`);
         let preparedStatement = this.database.prepare(query);
-        console.log(`prepared builder: ${JSON.stringify(this)}`);
         if (this.bindings.length > 0) {
             preparedStatement = preparedStatement.bind(...this.bindings);
         }
 
-        console.log(`prepared statement: ${JSON.stringify(preparedStatement)}`);
         return preparedStatement;
     }
 
@@ -53,18 +46,12 @@ export default class QueryBuilder {
     }
 
     select(table, fields = []) {
-        console.log(`Builder: Selecting from ${table} with fields: ${JSON.stringify(fields)}`);
-        let selectFields = '*';
+        let selectFieldString = '*';
         if (fields.length > 0) {
-            let selectFieldList = [];
-            fields.forEach((field) => {
-                selectFieldList.push('?');
-                this.bindings.push(field);
-            });
-            selectFields = selectFieldList.join(',');
+            selectFieldString = fields.join(',');
         }
 
-        this.command = `SELECT ${selectFields} FROM ${table}`;
+        this.command = `SELECT ${selectFieldString} FROM ${table}`;
         return this;
     }
 
@@ -86,7 +73,8 @@ export default class QueryBuilder {
     }
 
     delete(table) {
-        throw new Error("DELETE not implemented");
+        this.command = `DELETE FROM ${table}`;
+        return this;
     }
 
     where(filters = {}) {

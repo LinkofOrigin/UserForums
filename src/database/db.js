@@ -56,11 +56,33 @@ class Database {
     }
 
     async update(table, fields = [], values = [], where = {}) {
-
+        throw new Error("Not yet implemented.");
     }
 
     async delete(table, where = {}) {
+        const database = Environment.instance.USER_FORUMS_DB;
+        let queryBuilder = new QueryBuilder(database);
+        queryBuilder.delete(table).where(where);
+        let deleteQuery = queryBuilder.parse();
 
+        console.log(`Running DELETE: ${JSON.stringify(deleteQuery)}`);
+
+        let results;
+        try {
+            results = await deleteQuery.run();
+        }
+        catch (error) {
+            console.error(`Received error during db delete call: ${JSON.stringify(error)}`);
+            throw error;
+        }
+
+        console.log(`Returning database result from delete: ${JSON.stringify(results)}`);
+        if (!results.success) {
+            console.error("Error deleting records into Database!");
+            throw new Error("Failed to delete records in DB!");
+        }
+
+        return results.results;
     }
 
     async query(query, bindings = []) {

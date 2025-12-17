@@ -11,7 +11,7 @@ class Signup {
 
         // TODO: Hash password
         const insertResults = await DBInstance.insert('users', ['username', 'password'], [username, password]);
-        return true;
+        return insertResults;
     }
 
     async usernameExists(username) {
